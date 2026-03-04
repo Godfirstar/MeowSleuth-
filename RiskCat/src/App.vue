@@ -1,11 +1,13 @@
 <script setup>
-import { computed, ref } from 'vue'
+import { computed, ref, watch, onMounted, onBeforeUnmount } from 'vue'
 
 const activeTab = ref('victim')
 const role = ref('elderly')
 const inputMode = ref('chat')
 const riskScore = ref(86)
+const animatedScore = ref(22)
 const showPopup = ref(false)
+let scoreTimer = null
 
 const roleThreshold = {
   elderly: 55,
@@ -44,6 +46,40 @@ const evidence = {
   transcript: '转写证据："你涉嫌洗钱，现在把资金转入安全账户核查。"',
 }
 
+function animateScore(from, to, duration = 900) {
+  if (scoreTimer) clearInterval(scoreTimer)
+  const start = performance.now()
+  const delta = to - from
+  const tickMs = 16
+
+  scoreTimer = setInterval(() => {
+    const progress = Math.min((performance.now() - start) / duration, 1)
+    const eased = 1 - Math.pow(1 - progress, 3)
+    animatedScore.value = Math.round(from + delta * eased)
+
+    if (progress >= 1) {
+      clearInterval(scoreTimer)
+      scoreTimer = null
+      animatedScore.value = to
+    }
+  }, tickMs)
+}
+
+watch(role, (newRole) => {
+  const nextScore = newRole === 'elderly' ? 86 : newRole === 'student' ? 71 : 63
+  const prev = riskScore.value
+  riskScore.value = nextScore
+  animateScore(prev, nextScore)
+})
+
+onMounted(() => {
+  animateScore(22, riskScore.value, 1200)
+})
+
+onBeforeUnmount(() => {
+  if (scoreTimer) clearInterval(scoreTimer)
+})
+
 function triggerPopup() {
   showPopup.value = true
 }
@@ -71,7 +107,10 @@ function exportReport() {
 
 <template>
   <div class="page">
-    <header class="topbar">
+    <div class="aurora aurora-a"></div>
+    <div class="aurora aurora-b"></div>
+
+    <header class="topbar float-in">
       <h1>RiskCat · 反诈智能前端演示</h1>
       <div class="tabs">
         <button :class="{ active: activeTab === 'victim' }" @click="activeTab = 'victim'">用户端（受害者）</button>
@@ -80,7 +119,8 @@ function exportReport() {
       </div>
     </header>
 
-    <main v-if="activeTab === 'victim'" class="panel">
+    <Transition name="fade-slide" mode="out-in">
+    <main v-if="activeTab === 'victim'" key="victim" class="panel">
       <section class="left chat-like">
         <h2>多模态输入入口</h2>
         <div class="mode-switch">
@@ -114,7 +154,7 @@ function exportReport() {
       <section class="right">
         <div class="risk-card" :class="riskColor">
           <h3>风险等级大卡片</h3>
-          <p class="score">风险分：{{ riskScore }}</p>
+          <p class="score">风险分：{{ animatedScore }}</p>
           <p>{{ riskLevel }}</p>
           <small>当前策略：{{ roleName[role] }}（阈值 {{ roleThreshold[role] }}）</small>
         </div>
@@ -154,7 +194,7 @@ function exportReport() {
       </section>
     </main>
 
-    <main v-else-if="activeTab === 'guardian'" class="panel single">
+    <main v-else-if="activeTab === 'guardian'" key="guardian" class="panel single">
       <section class="full">
         <h2>监护人端（家属视角）</h2>
         <div class="guardian-grid">
@@ -187,7 +227,7 @@ function exportReport() {
       </section>
     </main>
 
-    <main v-else class="panel single">
+    <main v-else key="dashboard" class="panel single">
       <section class="full">
         <h2>后台看板（可控性 / 可运营）</h2>
         <div class="dashboard-grid">
@@ -223,13 +263,16 @@ function exportReport() {
         </div>
       </section>
     </main>
+    </Transition>
 
+    <Transition name="pop">
     <div v-if="showPopup" class="modal-mask" @click.self="showPopup = false">
-      <div class="modal">
+      <div class="modal danger-pulse">
         <h3>高危提醒</h3>
         <p>检测到高风险诈骗话术，请立即停止转账并联系家属核验！</p>
         <button @click="showPopup = false">我知道了</button>
       </div>
     </div>
+    </Transition>
   </div>
 </template>
