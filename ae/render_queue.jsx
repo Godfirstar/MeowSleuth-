@@ -1,4 +1,4 @@
-// render_queue.jsx - queue MAIN render
+// render_queue.jsx - queue MAIN render to ae/out/main.mov
 (function () {
     app.beginUndoGroup("Queue MAIN Render");
     var root = "C:/Users/FIRST/Desktop/projects";
@@ -17,12 +17,10 @@
     if (!mainComp) throw new Error("MAIN comp not found.");
 
     var rqItem = app.project.renderQueue.items.add(mainComp);
-    try { rqItem.applyTemplate("Best Settings"); } catch (e1) {}
+    try { rqItem.applyTemplate("Best Settings"); } catch (e) {}
     var om = rqItem.outputModule(1);
     try { om.applyTemplate("Lossless"); } catch (e2) {}
-
-    var outFile = new File(root + "/ae/out/main.mov");
-    om.file = outFile;
+    om.file = new File(root + "/ae/out/main.mov");
 
     app.endUndoGroup();
 })();
