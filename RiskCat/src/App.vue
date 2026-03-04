@@ -7,7 +7,9 @@ const inputMode = ref('chat')
 const riskScore = ref(86)
 const animatedScore = ref(22)
 const showPopup = ref(false)
+const showIntro = ref(true)
 let scoreTimer = null
+let introTimer = null
 
 const roleThreshold = {
   elderly: 55,
@@ -72,12 +74,20 @@ watch(role, (newRole) => {
   animateScore(prev, nextScore)
 })
 
+function closeIntro() {
+  showIntro.value = false
+}
+
 onMounted(() => {
   animateScore(22, riskScore.value, 1200)
+  introTimer = setTimeout(() => {
+    showIntro.value = false
+  }, 3000)
 })
 
 onBeforeUnmount(() => {
   if (scoreTimer) clearInterval(scoreTimer)
+  if (introTimer) clearTimeout(introTimer)
 })
 
 function triggerPopup() {
@@ -107,6 +117,16 @@ function exportReport() {
 
 <template>
   <div class="page">
+    <Transition name="intro-fade">
+      <div v-if="showIntro" class="intro-screen" @click="closeIntro">
+        <div class="intro-radar"></div>
+        <div class="intro-ring"></div>
+        <h1>RiskCat</h1>
+        <p>多模态反诈助手</p>
+        <small>点击跳过</small>
+      </div>
+    </Transition>
+
     <div class="aurora aurora-a"></div>
     <div class="aurora aurora-b"></div>
 
