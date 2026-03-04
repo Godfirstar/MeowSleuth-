@@ -1,0 +1,84 @@
+[1] 数字滚动（Slider驱动）
+挂载属性：Text Layer > Source Text
+--------------------------------
+Math.round(thisComp.layer("CTRL_Score").effect("Score")("Slider")).toString()
+
+[2] 扫描线循环（上下往返）
+挂载属性：扫描线 Shape Layer > Transform > Position
+--------------------------------
+x = value[0];
+yMin = 120;
+yMax = 960;
+dur = 1.6; // 一次循环秒数
+t = (time % dur) / dur;
+y = linear(t, 0, 1, yMin, yMax);
+[x, y]
+
+[3] 雷达扇形匀速旋转
+挂载属性：雷达扇形 Layer > Transform > Rotation
+--------------------------------
+speed = 90; // 每秒90度
+time * speed
+
+[4] 波纹扩散（圆环循环放大+透明衰减）
+挂载属性：圆环 Layer > Transform > Scale
+--------------------------------
+minS = 60;
+maxS = 180;
+dur = 2.0;
+phase = (index * 0.25) % 1; // 多层错相
+t = ((time / dur) + phase) % 1;
+s = ease(t, 0, 1, minS, maxS);
+[s, s]
+
+挂载属性：同一圆环 Layer > Transform > Opacity
+--------------------------------
+dur = 2.0;
+phase = (index * 0.25) % 1;
+t = ((time / dur) + phase) % 1;
+ease(t, 0, 1, 80, 0)
+
+[5] 弹窗弹性（基于关键帧的回弹）
+挂载属性：预警弹窗 Layer > Transform > Scale
+--------------------------------
+amp = 0.18;   // 振幅
+freq = 3.5;   // 频率
+decay = 6.0;  // 衰减
+n = 0;
+if (numKeys > 0){
+  n = nearestKey(time).index;
+  if (key(n).time > time) n--;
+}
+if (n > 0){
+  t = time - key(n).time;
+  v = velocityAtTime(key(n).time - thisComp.frameDuration/10);
+  value + v * amp * Math.sin(freq * t * 2*Math.PI) / Math.exp(decay * t);
+}else{
+  value
+}
+
+[6] 轻微抖动（警报态）
+挂载属性：预警弹窗 Layer > Transform > Position
+--------------------------------
+posterizeTime(12);
+base = value;
+w = wiggle(3, 6); // 3次/秒，6像素
+[base[0] + (w[0]-base[0])*0.35, base[1] + (w[1]-base[1])*0.35]
+
+[7] 全镜头轻推（2.5D镜头感）
+挂载属性：SHOT_PRECOMP Layer > Transform > Scale
+--------------------------------
+startT = inPoint;
+endT = outPoint;
+s0 = 100;
+s1 = 108;
+s = ease(time, startT, endT, s0, s1);
+[s, s]
+
+[8] HUD呼吸发光（强度缓动）
+挂载属性：Glow Effect > Glow Intensity
+--------------------------------
+base = 0.55;
+amp = 0.12;
+freq = 0.6;
+base + amp * Math.sin(time * freq * 2*Math.PI)
