@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">RiskCat</string>
+    <string name="title_activity_main">RiskCat</string>
+    <string name="package_name">com.riskcat.app</string>
+    <string name="custom_url_scheme">com.riskcat.app</string>
+</resources>
