@@ -20,8 +20,11 @@ body {
   color: var(--ink);
   font-family: 'Noto Serif SC', 'Songti SC', serif;
   background:
-    linear-gradient(rgba(123, 109, 82, 0.35), rgba(76, 66, 48, 0.45)),
-    url('/bg.webp') center / cover no-repeat fixed;
+    radial-gradient(circle at 18% 12%, rgba(182, 156, 95, 0.28), transparent 36%),
+    radial-gradient(circle at 82% 88%, rgba(118, 140, 98, 0.26), transparent 42%),
+    linear-gradient(135deg, rgba(35, 30, 21, 0.93), rgba(58, 50, 36, 0.9)),
+    linear-gradient(180deg, #4a4332 0%, #221d13 100%);
+  background-attachment: fixed;
 }
 
 body::before {
@@ -29,15 +32,22 @@ body::before {
   position: fixed;
   inset: 0;
   pointer-events: none;
-  opacity: 0.2;
   z-index: 30;
+  opacity: 0.38;
   background-image:
     repeating-linear-gradient(
       to bottom,
-      rgba(255, 255, 255, 0.05) 0,
-      rgba(255, 255, 255, 0.05) 1px,
-      transparent 2px,
-      transparent 4px
+      rgba(255, 238, 194, 0.09) 0,
+      rgba(255, 238, 194, 0.09) 1px,
+      transparent 1px,
+      transparent 3px
+    ),
+    repeating-linear-gradient(
+      to right,
+      rgba(136, 121, 88, 0.12) 0,
+      rgba(136, 121, 88, 0.12) 1px,
+      transparent 1px,
+      transparent 28px
     );
 }
 
@@ -47,9 +57,11 @@ body::after {
   inset: 0;
   pointer-events: none;
   z-index: 31;
-  opacity: 0.16;
-  background-image: radial-gradient(rgba(0,0,0,0.55) 0.65px, transparent 0.65px);
-  background-size: 3px 3px;
+  opacity: 0.2;
+  background:
+    radial-gradient(ellipse at center, transparent 60%, rgba(0, 0, 0, 0.46) 100%),
+    radial-gradient(rgba(22, 19, 13, 0.45) 0.8px, transparent 0.8px);
+  background-size: cover, 3px 3px;
 }
 
 #app { min-height: 100vh; position: relative; z-index: 2; }
